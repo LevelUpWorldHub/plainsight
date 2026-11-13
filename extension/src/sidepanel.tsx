@@ -8,6 +8,7 @@ import {
   listStoredRules,
   notifyLedgerChanged,
 } from "@/lib/phi/ledger";
+import { restoreReply } from "@/lib/phi/restore";
 import { runScan } from "@/lib/phi/run-scan";
 import type { PrivacyRule, ScanResult } from "@/lib/phi/types";
 import { EXTENSION_SAMPLES } from "./samples";
@@ -44,6 +45,8 @@ function SidePanel() {
   const [result, setResult] = useState<ScanResult | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
+  const [reply, setReply] = useState("");
+  const [restored, setRestored] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -85,6 +88,7 @@ function SidePanel() {
     setBusy(true);
     setError("");
     setNotice("");
+    setRestored("");
     try {
       const configured = isFirebaseConfigured();
       setResult(
@@ -200,6 +204,32 @@ function SidePanel() {
               Approve redacted text
             </button>
           </div>
+          <section className="pane">
+            <h2>Bring the reply back</h2>
+            <p className="detail">Swaps tokens in document order. Nothing is copied or logged.</p>
+            <label>
+              Chat reply
+              <textarea
+                value={reply}
+                onChange={(event) => setReply(event.target.value)}
+                placeholder="Paste the reply that still contains [NAME] or [SSN]."
+              />
+            </label>
+            <button
+              type="button"
+              className="secondary"
+              onClick={() => {
+                const next = restoreReply(reply, result.findings);
+                setRestored(next.text);
+                setNotice(
+                  `Restored ${next.restored} token${next.restored === 1 ? "" : "s"} on this device. Do not paste it into the chat.`,
+                );
+              }}
+            >
+              Restore on this device
+            </button>
+            {restored ? <p className="warn">{restored}</p> : null}
+          </section>
           {result.cloudOffer ? (
             <section className="pane">
               <h2>Cloud would receive this</h2>

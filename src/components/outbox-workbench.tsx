@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -16,7 +17,7 @@ import {
   notifyLedgerChanged,
 } from "@/lib/phi/ledger";
 import { charactersHeld } from "@/lib/phi/redact";
-import { restoreReply } from "@/lib/phi/restore";
+import { FRONT_DESK_REPLY, restoreReply } from "@/lib/phi/restore";
 import { runScan } from "@/lib/phi/run-scan";
 import { SAMPLE_DOCUMENTS, fetchSample } from "@/lib/phi/samples";
 import { DESTINATIONS, type PrivacyRule, type ScanResult } from "@/lib/phi/types";
@@ -87,6 +88,23 @@ export function OutboxWorkbench() {
     const held = charactersHeld(next.findings);
     setCue(
       `Step 1 of the front desk. ${next.findings.length} spans and ${held} characters stay on this device. The service date and the amount due are still in the outbox. Approve only the right-hand column.`,
+    );
+  }
+
+  async function runReplyDemo() {
+    let next = result && result.original === text ? result : null;
+    if (!next) {
+      const sample = await fetchSample("medical-bill.txt");
+      next = await scan(false, sample);
+    }
+    if (!next) return;
+    const restoredReply = restoreReply(FRONT_DESK_REPLY, next.findings);
+    setReply(FRONT_DESK_REPLY);
+    setRestored(restoredReply.text);
+    const unmatched =
+      restoredReply.unmatched > 0 ? `, ${restoredReply.unmatched} left unmatched` : "";
+    setCue(
+      `Step 3. The chatbot answered in tokens. ${restoredReply.restored} were swapped back on this device${unmatched}. The restored sentence is not copied and not logged.`,
     );
   }
 
@@ -208,6 +226,9 @@ export function OutboxWorkbench() {
           <Button type="button" variant="outline" disabled={status === "scanning"} onClick={() => void runDeskDemo()}>
             Run the front-desk demo
           </Button>
+          <Button type="button" variant="outline" disabled={status === "scanning"} onClick={() => void runReplyDemo()}>
+            Step 3: the reply comes back
+          </Button>
           {status === "scanning" ? (
             <p role="status" className="text-sm text-muted-foreground">
               {download !== null
@@ -226,10 +247,20 @@ export function OutboxWorkbench() {
       {cue ? (
         <section className="paper-panel rounded-xl p-4" aria-live="polite">
           <h2 className="font-heading text-xl">What a judge should see</h2>
-          <p className="mt-2 text-sm leading-6">{cue}</p>
-          <Button type="button" variant="outline" className="mt-3" disabled={status === "scanning"} onClick={() => void runMissDemo()}>
-            Step 2: the name in a sentence
-          </Button>
+          <p className="mt-2 text-sm leading-6">
+            {cue}{" "}
+            <Link href="/impact" className="text-primary underline-offset-4 hover:underline">
+              See the five-file totals.
+            </Link>
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button type="button" variant="outline" disabled={status === "scanning"} onClick={() => void runMissDemo()}>
+              Step 2: the name in a sentence
+            </Button>
+            <Button type="button" variant="outline" disabled={status === "scanning"} onClick={() => void runReplyDemo()}>
+              Step 3: the reply comes back
+            </Button>
+          </div>
         </section>
       ) : null}
       {notice ? (
@@ -311,9 +342,17 @@ export function OutboxWorkbench() {
               Restore on this device
             </Button>
             {restored ? (
-              <p className="mt-3 font-mono text-sm whitespace-pre-wrap" aria-live="polite">
-                {restored}
-              </p>
+              <div className="mt-3 grid gap-3 lg:grid-cols-2" aria-live="polite">
+                <div className="rounded-lg bg-muted p-3">
+                  <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Reply with tokens</p>
+                  <p className="mt-2 font-mono text-sm whitespace-pre-wrap">{reply}</p>
+                </div>
+                <div className="rounded-lg border border-primary/30 bg-primary/5 p-3">
+                  <p className="text-xs font-medium tracking-wide text-primary uppercase">On this device only</p>
+                  <p className="mt-2 font-mono text-sm whitespace-pre-wrap">{restored}</p>
+                  <p className="mt-2 text-sm text-destructive">Do not paste this into the chatbot.</p>
+                </div>
+              </div>
             ) : null}
           </section>
           {result.cloudOffer ? (

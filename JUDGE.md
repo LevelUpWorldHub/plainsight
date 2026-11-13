@@ -211,3 +211,21 @@ Fixes: the cloud assert searches the whole prompt, refuses an unchanged document
 Re-score: **Tech 9.6 · Design 9.4 · Impact 9.4 · Idea 9.4**
 
 Gain: tech +0.1, design +0.1, impact +0.2. Idea unchanged. Design, impact, and idea are still short of 9.5 because the reply-restore beat is easy to miss and the front-desk demo never lands on the measured 733-character set.
+
+## Round 12 — Close the last three gaps
+
+Opening scores: **Tech 9.6 · Design 9.4 · Impact 9.4 · Idea 9.4**
+
+Top 5 gaps:
+
+1. Reply restore was a paragraph under the outbox, not a beat in the demo.
+2. The extension panel could approve an outbox and could not put a reply back.
+3. The front-desk cue never pointed at the measured five-file page.
+4. The impact page never pointed back at the demo that produces one of those files.
+5. A restored sentence looked like ordinary body text, so a judge could paste it into the chatbot by mistake.
+
+Fixes: **Step 3: the reply comes back** loads the clinic bill if nothing is scanned, fills a tokenized reply, and shows it beside the restored sentence. The clinic-bill test checks that reply becomes Mara Ellison and `453-22-1890` with nothing left unmatched. The extension panel has the same restore and does not copy it. The demo cue links to Impact. Impact links to the outbox. The restored column says “Do not paste this into the chatbot.” The built impact page still reports 733 characters, 44 identifiers, and 28% of characters. The demo script includes the shot.
+
+Re-score: **Tech 9.6 · Design 9.5 · Impact 9.5 · Idea 9.5**
+
+Gain: design +0.1, impact +0.1, idea +0.1. Tech unchanged. Every criterion is at least 9.5, so the loop stops. Live Gemini Nano is still unproven without a Firebase project, which is why tech is 9.6 and not higher.

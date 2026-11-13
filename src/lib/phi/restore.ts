@@ -3,6 +3,9 @@ import type { Finding } from "./types";
 const TOKEN =
   /\[(?:NAME|DATE OF BIRTH|MRN|INSURANCE ID|ADDRESS|PHONE|SSN|EMAIL|DIAGNOSIS|MEDICATION)\]/g;
 
+export const FRONT_DESK_REPLY =
+  "The statement for [NAME] is ready to explain. Do not read the [SSN] aloud. The amount due can stay.";
+
 export interface RestoredReply {
   text: string;
   restored: number;

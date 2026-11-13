@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { BrowserLedgerImpact } from "@/components/browser-ledger-impact";
 import { heldPercent, measureDocument, sumImpact } from "@/lib/phi/impact";
 import { SAMPLE_DOCUMENTS } from "@/lib/phi/samples";
@@ -31,7 +32,11 @@ export default function ImpactPage() {
           {total.charactersHeld.toLocaleString()} characters would have left with the paperwork.
         </h1>
         <p className="mt-3 text-muted-foreground">
-          These figures are computed on this device by the same detector the outbox uses, against the {rows.length} fictional files in <span className="font-mono">samples/</span>. They are not a national statistic and they are not a live clinic.
+          These figures are computed on this device by the same detector the outbox uses, against the {rows.length} fictional files in <span className="font-mono">samples/</span>. They are not a national statistic and they are not a live clinic. The front-desk demo starts with the clinic bill.{" "}
+          <Link href="/" className="text-primary underline-offset-4 hover:underline">
+            Open the outbox
+          </Link>
+          .
         </p>
       </header>
 

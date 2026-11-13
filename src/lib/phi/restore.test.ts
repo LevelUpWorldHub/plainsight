@@ -1,7 +1,8 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { detectHeuristic } from "./detect";
 import { redact } from "./redact";
-import { restoreReply } from "./restore";
+import { FRONT_DESK_REPLY, restoreReply } from "./restore";
 
 describe("restoreReply", () => {
   it("puts originals back in encounter order and leaves unknown tokens", () => {
@@ -15,6 +16,16 @@ describe("restoreReply", () => {
     expect(restored.text.endsWith("[SSN].")).toBe(true);
     expect(restored.restored).toBe(3);
     expect(restored.unmatched).toBe(1);
+  });
+
+  it("restores the front-desk reply against the clinic bill", () => {
+    const bill = readFileSync(new URL("../../../samples/medical-bill.txt", import.meta.url), "utf8");
+    const restored = restoreReply(FRONT_DESK_REPLY, detectHeuristic(bill));
+    expect(restored.text).toContain("Mara Ellison");
+    expect(restored.text).toContain("453-22-1890");
+    expect(restored.text).not.toContain("[NAME]");
+    expect(restored.text).not.toContain("[SSN]");
+    expect(restored.unmatched).toBe(0);
   });
 
   it("does not invent a value for a token the scan did not find", () => {

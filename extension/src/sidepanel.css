@@ -125,5 +125,13 @@ button:focus-visible, select:focus-visible, textarea:focus-visible {
 .phi { background: #f3d27a; }
 .token { background: #1c1915; color: #f7f3ea; padding: 0 3px; }
 
+.warn {
+  margin-top: 8px;
+  border: 1px solid #1d4f4a;
+  background: #e7f0ee;
+  border-radius: 8px;
+  padding: 8px;
+}
+
 .error { color: #8a3418; }
 .notice { color: #1d4f4a; }
