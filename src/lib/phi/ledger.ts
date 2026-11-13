@@ -1,4 +1,4 @@
-import { countByType } from "./redact";
+import { charactersHeld, countByType } from "./redact";
 import type { Finding, InferencePath, LedgerEntry } from "./types";
 
 const DB_NAME = "plainsight";
@@ -22,6 +22,7 @@ export function createLedgerEntry(input: {
     destination: input.destination,
     redactionCounts: countByType(input.findings),
     totalRedactions: input.findings.length,
+    charactersHeld: charactersHeld(input.findings),
     path: input.path,
     redactedPreview: preview,
     kind: input.kind,

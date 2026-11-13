@@ -118,6 +118,7 @@ export interface LedgerEntry {
   destination: string;
   redactionCounts: Partial<Record<EntityType, number>>;
   totalRedactions: number;
+  charactersHeld?: number;
   path: InferencePath;
   redactedPreview: string;
   kind: "text" | "image";

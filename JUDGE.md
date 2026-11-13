@@ -155,3 +155,21 @@ Fixes: `netlify.toml` builds with Node 22 and publishes `.next`, which is what N
 Re-score: **Tech 9.4 · Design 9.0 · Impact 7.2 · Idea 8.2**
 
 Gain: tech +0.1, impact +0.1. Design and idea unchanged. A judge can deploy it. The impact case is still not computed across the sample set in the product.
+
+## Round 9 — Impact story with real numbers
+
+Opening scores: **Tech 9.4 · Design 9.0 · Impact 7.2 · Idea 8.2**
+
+Top 5 gaps:
+
+1. The only number on screen was the last scan. A judge could not see the set.
+2. Inventing a “patients affected” statistic would have been dishonest.
+3. The ledger stored counts but not characters held, so a browser total could not be summed.
+4. Impact was a README paragraph, not a page a recording can land on.
+5. There was no per-file breakdown a skeptic could recompute.
+
+Fixes: `/impact` runs `measureDocument` on the five fictional files at build time. The built page reports **733 characters held, 44 identifiers, 28% of those documents**. The copy says these are the sample files, not a clinic census. New ledger entries store `charactersHeld`, and the page sums what this browser has approved.
+
+Re-score: **Tech 9.4 · Design 9.1 · Impact 9.0 · Idea 8.4**
+
+Gain: design +0.1, impact +1.8, idea +0.2. Tech unchanged. The idea is still one step from a feature Rescriber cannot imitate in the same breath: putting the original back, locally, after the model replies.
