@@ -197,6 +197,14 @@ CI is `.github/workflows/ci.yml`. It runs the test, lint, Next.js build, and ext
 - `extension/` — Manifest V3 source; `extension/dist` is the unpacked build
 - `samples/` — fictional documents
 
+## Deploy
+
+The site is a static-friendly Next.js app. [Deploy to Netlify](https://app.netlify.com/start/deploy?repository=https://github.com/LevelUpWorldHub/plainsight) uses `netlify.toml`: Node 22, `npm run build`, publish `.next`. Netlify installs the Next.js runtime. Leave the Firebase environment variables empty to ship the on-device heuristic. Set the `NEXT_PUBLIC_*` values from `.env.example` in the Netlify UI when Mark’s project is ready. Do not mark `NEXT_PUBLIC_APPCHECK_DEBUG` true on that site.
+
+The extension is not part of the website deploy. Build it with `npm run build:extension` and load `extension/dist` unpacked.
+
+A production Lighthouse run of the home page (mobile) scored 98 performance, 100 accessibility, 100 best practices, and 100 SEO.
+
 ## Built for #BuildHybridAI
 
 PlainSight is an entry for Google’s #BuildHybridAI hackathon on Devpost. Judging closes after submissions; the deadline for this entry is Monday, November 30, 2026 at 2:00 PM PT.

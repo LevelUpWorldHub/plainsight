@@ -137,3 +137,21 @@ Fixes: CSP plus `nosniff`, `DENY` frames, referrer policy, and a locked-down per
 Re-score: **Tech 9.3 · Design 9.0 · Impact 7.1 · Idea 8.2**
 
 Gain: tech +0.2, idea +0.1. Design and impact unchanged. The privacy story is tighter. It still is not a page of measured totals, and a rival can still say “this is a regex redactor with a badge.”
+
+## Round 8 — Docs and one-click deploy
+
+Opening scores: **Tech 9.3 · Design 9.0 · Impact 7.1 · Idea 8.2**
+
+Top 5 gaps:
+
+1. There was no deploy config, so a judge who cloned the repo still had to invent hosting.
+2. The README did not point at a one-click path for the public mirror `LevelUpWorldHub/plainsight`.
+3. Lighthouse numbers lived only in this log.
+4. Firebase env vars could be mistaken for secrets and blocked by a secrets scanner, or debug App Check could be turned on in production by accident.
+5. The extension build was easy to confuse with the website deploy.
+
+Fixes: `netlify.toml` builds with Node 22 and publishes `.next`, which is what Netlify’s Next runtime expects. The README has a Deploy to Netlify link aimed at the public mirror, says to leave Firebase empty for the heuristic demo, records the Lighthouse scores, and separates the extension from the site deploy.
+
+Re-score: **Tech 9.4 · Design 9.0 · Impact 7.2 · Idea 8.2**
+
+Gain: tech +0.1, impact +0.1. Design and idea unchanged. A judge can deploy it. The impact case is still not computed across the sample set in the product.

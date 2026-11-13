@@ -1,0 +1,14 @@
+# One-click deploy: Netlify detects Next.js and installs the Next runtime.
+# https://docs.netlify.com/build/frameworks/framework-setup-guides/nextjs/
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_FIREBASE_API_KEY,NEXT_PUBLIC_RECAPTCHA_ENTERPRISE_SITE_KEY"
+
+# Public Firebase web config is not a secret, but it must be present at build time
+# for the client bundle. Leave the values empty to ship the on-device heuristic only.
+# Set them in the Netlify UI. Never put a private key here.
