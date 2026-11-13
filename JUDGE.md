@@ -83,3 +83,21 @@ Fixes: scans over 200,000 characters throw `DocumentTooLargeError` before detect
 Re-score: **Tech 8.6 · Design 8.2 · Impact 6.6 · Idea 7.7**
 
 Gain: tech +0.3, design +0.1. Impact and idea unchanged. The product still waits for the user to know the demo order.
+
+## Round 5 — Demo wow moment
+
+Opening scores: **Tech 8.6 · Design 8.2 · Impact 6.6 · Idea 7.7**
+
+Top 5 gaps:
+
+1. A judge had to know the script: load the bill, scan, then separately discover Maya Chen.
+2. The counts existed only as chips, not as a sentence tied to the action just taken.
+3. The caregiver-note miss, which is the point of plain-English rules, was easy to skip.
+4. Firebase was in the outbox’s initial import, so the first click paid for a library the demo does not use.
+5. There was no on-screen cue a recording could cut to.
+
+Fixes: “Run the front-desk demo” loads the fictional clinic bill, scans it, and states the live span count and characters held. “Step 2” loads the caregiver note and says whether Maya Chen is still in the outbox. The Firebase runner is imported only if a project is configured.
+
+Re-score: **Tech 8.7 · Design 8.6 · Impact 7.1 · Idea 8.1**
+
+Gain: tech +0.1, design +0.4, impact +0.5, idea +0.4. The demo now tells the story with numbers from the scan. It is not yet a measured page, and Lighthouse has not been run.

@@ -8,7 +8,6 @@ import { DiffView } from "@/components/diff-view";
 import { FindingSummary } from "@/components/finding-summary";
 import { PathBadge, ScanTraceNote } from "@/components/path-badge";
 import { isFirebaseConfigured } from "@/lib/firebase/config";
-import { createFirebaseModelRunner } from "@/lib/firebase/model-runner";
 import {
   RULES_CHANGED,
   addLedgerEntry,
@@ -16,6 +15,7 @@ import {
   listStoredRules,
   notifyLedgerChanged,
 } from "@/lib/phi/ledger";
+import { charactersHeld } from "@/lib/phi/redact";
 import { runScan } from "@/lib/phi/run-scan";
 import { SAMPLE_DOCUMENTS, fetchSample } from "@/lib/phi/samples";
 import { DESTINATIONS, type PrivacyRule, type ScanResult } from "@/lib/phi/types";
@@ -29,6 +29,7 @@ export function OutboxWorkbench() {
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [download, setDownload] = useState<number | null>(null);
+  const [cue, setCue] = useState("");
 
   useEffect(() => {
     const load = () => {
@@ -44,28 +45,57 @@ export function OutboxWorkbench() {
   const stale = Boolean(result && result.original !== text);
   const configured = isFirebaseConfigured();
 
-  async function scan(allowCloud: boolean) {
-    if (!text.trim()) {
+  async function scan(allowCloud: boolean, source = text): Promise<ScanResult | null> {
+    if (!source.trim()) {
       setError("Paste a document or load a sample first.");
-      return;
+      return null;
     }
+    setText(source);
     setError("");
     setNotice("");
     setStatus("scanning");
     setDownload(null);
     try {
-      const next = await runScan(text, rules, {
+      const model = configured
+        ? (await import("@/lib/firebase/model-runner")).createFirebaseModelRunner()
+        : undefined;
+      const next = await runScan(source, rules, {
         firebaseConfigured: configured,
         allowCloud,
-        model: configured ? createFirebaseModelRunner() : undefined,
+        model,
         onDownloadProgress: (ratio) => setDownload(ratio),
       });
       setResult(next);
+      return next;
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "The scan failed on this device.");
+      return null;
     } finally {
       setStatus("idle");
     }
+  }
+
+  async function runDeskDemo() {
+    setCue("");
+    setDestination("ChatGPT");
+    const sample = await fetchSample("medical-bill.txt");
+    const next = await scan(false, sample);
+    if (!next) return;
+    const held = charactersHeld(next.findings);
+    setCue(
+      `Step 1 of the front desk. ${next.findings.length} spans and ${held} characters stay on this device. The service date and the amount due are still in the outbox. Approve only the right-hand column.`,
+    );
+  }
+
+  async function runMissDemo() {
+    const sample = await fetchSample("caregiver-note.txt");
+    const next = await scan(false, sample);
+    if (!next) return;
+    setCue(
+      next.redacted.includes("Maya Chen")
+        ? "Step 2. Maya Chen is still in the outbox, because the name is only in a sentence. Sertraline was caught. Open Rules, save “never send my kid's name Maya Chen,” and scan again."
+        : "Step 2. A rule on this device already hid Maya Chen. The outbox is the text that can leave.",
+    );
   }
 
   async function loadSample(file: string) {
@@ -165,9 +195,15 @@ export function OutboxWorkbench() {
             size="lg"
             className="h-11"
             disabled={status === "scanning"}
-            onClick={() => scan(false)}
+            onClick={() => {
+              setCue("");
+              void scan(false);
+            }}
           >
             {status === "scanning" ? "Reading on this device…" : "Scan on this device"}
+          </Button>
+          <Button type="button" variant="outline" disabled={status === "scanning"} onClick={() => void runDeskDemo()}>
+            Run the front-desk demo
           </Button>
           {status === "scanning" ? (
             <p role="status" className="text-sm text-muted-foreground">
@@ -183,6 +219,15 @@ export function OutboxWorkbench() {
         <p role="alert" className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {error}
         </p>
+      ) : null}
+      {cue ? (
+        <section className="paper-panel rounded-xl p-4" aria-live="polite">
+          <h2 className="font-heading text-xl">What a judge should see</h2>
+          <p className="mt-2 text-sm leading-6">{cue}</p>
+          <Button type="button" variant="outline" className="mt-3" disabled={status === "scanning"} onClick={() => void runMissDemo()}>
+            Step 2: the name in a sentence
+          </Button>
+        </section>
       ) : null}
       {notice ? (
         <p role="status" className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-sm">
