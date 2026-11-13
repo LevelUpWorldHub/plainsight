@@ -39,6 +39,12 @@ export function SiteShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   return (
     <div className="flex min-h-full flex-col">
+      <a
+        href="#content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-card focus:px-3 focus:py-2 focus:text-sm focus:shadow"
+      >
+        Skip to the outbox
+      </a>
       <div className="h-1 bg-primary" />
       <OfflineNote />
       <header className="border-b border-border bg-card/80">
@@ -80,7 +86,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
           </nav>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+      <main id="content" className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8">{children}</main>
       <footer className="border-t border-border px-4 py-4 text-center text-xs text-muted-foreground sm:px-6">
         PlainSight records the redacted outbox on this device. It does not create an account or upload the original.
       </footer>

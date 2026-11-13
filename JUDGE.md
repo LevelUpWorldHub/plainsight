@@ -101,3 +101,21 @@ Fixes: “Run the front-desk demo” loads the fictional clinic bill, scans it, 
 Re-score: **Tech 8.7 · Design 8.6 · Impact 7.1 · Idea 8.1**
 
 Gain: tech +0.1, design +0.4, impact +0.5, idea +0.4. The demo now tells the story with numbers from the scan. It is not yet a measured page, and Lighthouse has not been run.
+
+## Round 6 — Accessibility and performance
+
+Opening scores: **Tech 8.7 · Design 8.6 · Impact 7.1 · Idea 8.1**
+
+Top 5 gaps:
+
+1. Lighthouse had never been run, so the 90+ bar was a hope.
+2. No skip link.
+3. Muted text was lighter than it needed to be on the paper background.
+4. Firebase was still statically imported on the rules and screenshot routes.
+5. The production bundle, not the dev server, is what a judge’s Lighthouse run would hit.
+
+Fixes: skip link to `#content`, darker muted text, Firebase loaded only when a project is configured. Production Lighthouse on `http://127.0.0.1:4321/` (mobile, Next.js start): **performance 98, accessibility 100, best practices 100, SEO 100**.
+
+Re-score: **Tech 9.1 · Design 9.0 · Impact 7.1 · Idea 8.1**
+
+Gain: tech +0.4, design +0.4. Impact and idea unchanged. The scores are measured, not estimated. Security headers and a hostile-input pass are still open, and impact is still a sentence on the outbox rather than a page of totals.

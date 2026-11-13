@@ -6,7 +6,6 @@ import { DiffView } from "@/components/diff-view";
 import { FindingSummary } from "@/components/finding-summary";
 import { PathBadge } from "@/components/path-badge";
 import { isFirebaseConfigured } from "@/lib/firebase/config";
-import { createFirebaseModelRunner } from "@/lib/firebase/model-runner";
 import {
   joinOcrLines,
   loadImage,
@@ -60,10 +59,13 @@ export function ImageWorkbench() {
       const image = await loadImage(file);
       const lines = await recognizeLines(file, setProgress);
       const joined = joinOcrLines(lines);
+      const configured = isFirebaseConfigured();
       const scan = await runScan(joined.text, rules, {
-        firebaseConfigured: isFirebaseConfigured(),
+        firebaseConfigured: configured,
         allowCloud: false,
-        model: isFirebaseConfigured() ? createFirebaseModelRunner() : undefined,
+        model: configured
+          ? (await import("@/lib/firebase/model-runner")).createFirebaseModelRunner()
+          : undefined,
       });
       const covered = wordsOverlappingFindings(joined.spans, scan.findings);
       const redacted = await paintRedactions(image, covered);

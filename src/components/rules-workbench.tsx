@@ -13,7 +13,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { isFirebaseConfigured } from "@/lib/firebase/config";
-import { createFirebaseModelRunner } from "@/lib/firebase/model-runner";
 import {
   deleteStoredRule,
   listStoredRules,
@@ -65,10 +64,10 @@ export function RulesWorkbench() {
     setPending(true);
     setError("");
     try {
-      const rule = await interpretRule(
-        value,
-        isFirebaseConfigured() ? createFirebaseModelRunner() : undefined,
-      );
+      const runner = isFirebaseConfigured()
+        ? (await import("@/lib/firebase/model-runner")).createFirebaseModelRunner()
+        : undefined;
+      const rule = await interpretRule(value, runner);
       if (rule.directives.length === 0) {
         setError("PlainSight could not turn that sentence into a rule. Name a detail or a category, such as SSNs.");
         return;
