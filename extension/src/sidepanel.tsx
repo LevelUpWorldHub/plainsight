@@ -169,6 +169,9 @@ function SidePanel() {
         <>
           <span className={badgeClass(result.path)}>{badgeLabel(result.path)}</span>
           <p className="detail">{result.detail}</p>
+          <p className="detail">
+            prefer_on_device · payload {result.trace.payload} · {result.trace.charactersSent} characters · source {result.trace.inferenceSource}
+          </p>
           <section className="pane">
             <h2>Will leave the device</h2>
             <p>

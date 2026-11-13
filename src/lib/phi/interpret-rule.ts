@@ -88,7 +88,7 @@ export async function interpretRule(
       documentText: plainText,
       prompt: rulePrompt(plainText),
     });
-    if (response.inferenceSource === "in_cloud") return base;
+    if (response.inferenceSource !== "on_device") return base;
     const directives = directivesFromModel(response.text, plainText);
     if (directives.length === 0) return base;
     return {

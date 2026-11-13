@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DiffView } from "@/components/diff-view";
 import { FindingSummary } from "@/components/finding-summary";
-import { PathBadge } from "@/components/path-badge";
+import { PathBadge, ScanTraceNote } from "@/components/path-badge";
 import { isFirebaseConfigured } from "@/lib/firebase/config";
 import { createFirebaseModelRunner } from "@/lib/firebase/model-runner";
 import {
@@ -28,6 +28,7 @@ export function OutboxWorkbench() {
   const [status, setStatus] = useState<"idle" | "scanning" | "saving">("idle");
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
+  const [download, setDownload] = useState<number | null>(null);
 
   useEffect(() => {
     const load = () => {
@@ -51,11 +52,13 @@ export function OutboxWorkbench() {
     setError("");
     setNotice("");
     setStatus("scanning");
+    setDownload(null);
     try {
       const next = await runScan(text, rules, {
         firebaseConfigured: configured,
         allowCloud,
         model: configured ? createFirebaseModelRunner() : undefined,
+        onDownloadProgress: (ratio) => setDownload(ratio),
       });
       setResult(next);
     } catch (cause) {
@@ -200,6 +203,12 @@ export function OutboxWorkbench() {
             <div className="flex flex-col gap-2">
               <PathBadge path={result.path} />
               <p className="max-w-2xl text-sm text-muted-foreground">{result.detail}</p>
+              <ScanTraceNote trace={result.trace} />
+              {download !== null ? (
+                <p className="text-sm text-muted-foreground">
+                  Gemini Nano download {Math.round(download * 100)}%.
+                </p>
+              ) : null}
             </div>
             <p className="text-sm text-muted-foreground">
               {rules.length === 0

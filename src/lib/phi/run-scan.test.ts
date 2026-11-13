@@ -32,6 +32,12 @@ describe("runScan", () => {
     expect(result.redacted).not.toContain("453-22-1890");
     expect(result.redacted).toContain("Maya Chen");
     expect(result.cloudOffer).toBeNull();
+    expect(result.trace).toEqual({
+      mode: "prefer_on_device",
+      payload: "none",
+      inferenceSource: "not_called",
+      charactersSent: 0,
+    });
   });
 
   it("offers the redacted payload instead of calling the cloud", async () => {
@@ -63,7 +69,11 @@ describe("runScan", () => {
       model,
     });
     expect(result.path).toBe("cloud");
+    expect(model.prompts[0]).toMatch(/untrusted data/i);
     expect(model.prompts[0]).not.toContain("453-22-1890");
+    expect(result.trace.payload).toBe("redacted");
+    expect(result.trace.inferenceSource).toBe("in_cloud");
+    expect(result.trace.charactersSent).toBeGreaterThan(0);
     expect(result.redacted).not.toContain("453-22-1890");
     expect(result.redacted).not.toContain("Maya Chen");
     expect(result.redacted).toContain("[NAME]");
@@ -81,6 +91,8 @@ describe("runScan", () => {
       { firebaseConfigured: true, allowCloud: false, model },
     );
     expect(result.path).toBe("on_device");
+    expect(result.trace.payload).toBe("original");
+    expect(result.trace.inferenceSource).toBe("on_device");
     expect(model.prompts[0]).toContain("XTR-4491208");
     expect(result.redacted).toContain("XTR-4491208");
     expect(result.redacted).not.toContain("Maya Chen");
@@ -99,6 +111,9 @@ describe("runScan", () => {
     });
     expect(result.path).toBe("heuristic_only");
     expect(result.redacted).toContain("Maya Chen");
+    expect(result.trace.payload).toBe("original");
+    expect(result.trace.inferenceSource).toBe("unknown");
+    expect(result.trace.charactersSent).toBe(original.length);
     expect(result.detail).toMatch(/on-device inference source/i);
   });
 

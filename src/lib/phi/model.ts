@@ -7,5 +7,8 @@ export interface ModelResponse {
 
 export interface ModelRunner {
   isOnDeviceReady: () => Promise<boolean>;
-  generate: (request: HybridPrompt) => Promise<ModelResponse>;
+  generate: (
+    request: HybridPrompt,
+    hooks?: { onDownloadProgress?: (ratio: number) => void },
+  ) => Promise<ModelResponse>;
 }

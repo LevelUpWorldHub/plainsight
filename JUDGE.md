@@ -29,3 +29,21 @@ Fixes: name tokens stop at field labels and at words like Balance; a letterhead 
 Re-score: **Tech 7.2 · Design 7.1 · Impact 6.2 · Idea 7.5**
 
 Gain: tech +0.6. Design, impact, and idea unchanged. The hybrid call is still a thin wrapper, and the product still does not show a judge the exact payload decision.
+
+## Round 2 — Firebase AI Logic hybrid depth
+
+Opening scores: **Tech 7.2 · Design 7.1 · Impact 6.2 · Idea 7.5**
+
+Top 5 gaps:
+
+1. The UI never said how many characters were eligible for a model, or whether that payload was the original or the redacted text.
+2. An unknown `inferenceSource` discarded findings but did not admit that the original had already been handed to the model.
+3. Cloud Gemini was not constrained to the findings JSON schema, so a chatty answer could miss the parser.
+4. The on-device session used Chrome’s default, which includes image input. PlainSight’s text scan should ask for English text only.
+5. Nano download progress was swallowed, and the cloud path still called `initializeDeviceModel`, which can start a download the user did not ask for.
+
+Fixes: every scan now carries a `trace` (`prefer_on_device`, payload kind, characters, reported source). Cloud `inCloudParams` set `responseMimeType: application/json` plus a findings schema. On-device `expectedInputs` / `expectedOutputs` are English text, with a JSON `responseConstraint`. Download progress is reported only on the on-device path. The prompt tells the model the document is untrusted data. Rule interpretation accepts model output only when `inferenceSource` is `on_device`.
+
+Re-score: **Tech 8.0 · Design 7.3 · Impact 6.2 · Idea 7.7**
+
+Gain: tech +0.8, design +0.2, idea +0.2. Impact unchanged. The trace is visible, but the outbox still does not lead with how much was held back, and `docs/screenshots/extension.png` is still missing. Live Nano and App Check still need Mark’s Firebase project.

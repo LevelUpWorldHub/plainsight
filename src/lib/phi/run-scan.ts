@@ -5,12 +5,20 @@ import { resolveOverlaps } from "./overlap";
 import { parseModelFindings, placeFindingsInOriginal } from "./parse-model";
 import { redact } from "./redact";
 import { applyRules } from "./rules";
-import type { PrivacyRule, ScanResult } from "./types";
+import type { PrivacyRule, ScanResult, ScanTrace } from "./types";
 
 export interface ScanOptions {
   firebaseConfigured: boolean;
   allowCloud: boolean;
   model?: ModelRunner;
+  onDownloadProgress?: (ratio: number) => void;
+}
+
+function traced(
+  result: Omit<ScanResult, "trace">,
+  trace: ScanTrace,
+): ScanResult {
+  return { ...result, trace };
 }
 
 export async function runScan(
@@ -31,14 +39,22 @@ export async function runScan(
       detail =
         "Deterministic detector on this device. Add a Firebase project to compare this result with Gemini Nano.";
     }
-    return {
-      original,
-      redacted: redactedFirst,
-      findings,
-      path,
-      detail,
-      cloudOffer: null,
-    };
+    return traced(
+      {
+        original,
+        redacted: redactedFirst,
+        findings,
+        path,
+        detail,
+        cloudOffer: null,
+      },
+      {
+        mode: "prefer_on_device",
+        payload: "none",
+        inferenceSource: "not_called",
+        charactersSent: 0,
+      },
+    );
   }
 
   let onDeviceReady = false;
@@ -49,15 +65,23 @@ export async function runScan(
   }
 
   if (!onDeviceReady && !options.allowCloud) {
-    return {
-      original,
-      redacted: redactedFirst,
-      findings,
-      path,
-      detail:
-        "Gemini Nano is not ready in this browser. The result below is from the on-device detector. Cloud Gemini is optional and only receives the redacted text.",
-      cloudOffer: redactedFirst,
-    };
+    return traced(
+      {
+        original,
+        redacted: redactedFirst,
+        findings,
+        path,
+        detail:
+          "Gemini Nano is not ready in this browser. The result below is from the on-device detector. Cloud Gemini is optional and only receives the redacted text.",
+        cloudOffer: redactedFirst,
+      },
+      {
+        mode: "prefer_on_device",
+        payload: "none",
+        inferenceSource: "not_called",
+        charactersSent: 0,
+      },
+    );
   }
 
   const request = buildHybridPrompt({
@@ -67,33 +91,54 @@ export async function runScan(
     redacted: redactedFirst,
   });
   if (!request) {
-    return {
-      original,
-      redacted: redactedFirst,
-      findings,
-      path,
-      detail,
-      cloudOffer: null,
-    };
+    return traced(
+      {
+        original,
+        redacted: redactedFirst,
+        findings,
+        path,
+        detail,
+        cloudOffer: null,
+      },
+      {
+        mode: "prefer_on_device",
+        payload: "none",
+        inferenceSource: "not_called",
+        charactersSent: 0,
+      },
+    );
   }
+
+  const sentTrace: ScanTrace = {
+    mode: "prefer_on_device",
+    payload: request.path === "on_device" ? "original" : "redacted",
+    inferenceSource: "not_called",
+    charactersSent: request.documentText.length,
+  };
 
   try {
     assertCloudPayloadIsRedacted(request, original, redactedFirst);
-    const response = await options.model!.generate(request);
+    const response = await options.model!.generate(request, {
+      onDownloadProgress: options.onDownloadProgress,
+    });
+    sentTrace.inferenceSource = response.inferenceSource;
     const wentToCloud = response.inferenceSource === "in_cloud";
     const stayedOnDevice = response.inferenceSource === "on_device";
 
     if (request.path === "on_device" && !stayedOnDevice) {
-      return {
-        original,
-        redacted: redactedFirst,
-        findings,
-        path: wentToCloud ? "cloud" : "heuristic_only",
-        detail: wentToCloud
-          ? "Cloud Gemini ran even though PlainSight expected Gemini Nano. Model suggestions were discarded. Review the outbox before approving."
-          : "The model did not report an on-device inference source. Model suggestions were discarded.",
-        cloudOffer: null,
-      };
+      return traced(
+        {
+          original,
+          redacted: redactedFirst,
+          findings,
+          path: wentToCloud ? "cloud" : "heuristic_only",
+          detail: wentToCloud
+            ? "Cloud Gemini ran even though PlainSight expected Gemini Nano. Model suggestions were discarded. Review the outbox before approving."
+            : "The model did not report an on-device inference source. Model suggestions were discarded.",
+          cloudOffer: null,
+        },
+        sentTrace,
+      );
     }
 
     const haystack = request.path === "cloud" ? redactedFirst : original;
@@ -120,16 +165,22 @@ export async function runScan(
         "Gemini Nano ran on this device through Firebase AI Logic (prefer_on_device). The original did not leave.";
     }
 
-    return { original, redacted, findings, path, detail, cloudOffer: null };
+    return traced(
+      { original, redacted, findings, path, detail, cloudOffer: null },
+      sentTrace,
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : "unknown error";
-    return {
-      original,
-      redacted: redactedFirst,
-      findings,
-      path: "heuristic_only",
-      detail: `The model call failed (${message}). Showing the on-device detector result.`,
-      cloudOffer: onDeviceReady ? null : redactedFirst,
-    };
+    return traced(
+      {
+        original,
+        redacted: redactedFirst,
+        findings,
+        path: "heuristic_only",
+        detail: `The model call failed (${message}). Showing the on-device detector result.`,
+        cloudOffer: onDeviceReady ? null : redactedFirst,
+      },
+      sentTrace,
+    );
   }
 }

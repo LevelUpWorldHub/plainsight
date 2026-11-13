@@ -94,6 +94,13 @@ export interface HybridPrompt {
   prompt: string;
 }
 
+export interface ScanTrace {
+  mode: "prefer_on_device";
+  payload: "none" | "original" | "redacted";
+  inferenceSource: "on_device" | "in_cloud" | "unknown" | "not_called";
+  charactersSent: number;
+}
+
 export interface ScanResult {
   original: string;
   redacted: string;
@@ -102,6 +109,7 @@ export interface ScanResult {
   detail: string;
   /** Exact text a cloud call would send. Null when no cloud call is offered. */
   cloudOffer: string | null;
+  trace: ScanTrace;
 }
 
 export interface LedgerEntry {

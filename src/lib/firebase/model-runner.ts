@@ -12,6 +12,7 @@ import {
   GoogleAIBackend,
   InferenceMode,
   InferenceSource,
+  Schema,
   type GenerativeModel,
 } from "firebase/ai";
 import type { ModelRunner } from "@/lib/phi/model";
@@ -65,9 +66,65 @@ async function createModel(): Promise<GenerativeModel | null> {
     });
   ensureAppCheck(app);
   const ai = getAI(app, { backend: new GoogleAIBackend() });
+  const findingSchema = Schema.object({
+    properties: {
+      findings: Schema.array({
+        items: Schema.object({
+          properties: {
+            type: Schema.enumString({
+              enum: [
+                "name",
+                "dob",
+                "mrn",
+                "insurance_id",
+                "address",
+                "phone",
+                "ssn",
+                "email",
+                "diagnosis",
+                "medication",
+              ],
+            }),
+            text: Schema.string(),
+          },
+        }),
+      }),
+    },
+  });
   return getGenerativeModel(ai, {
     mode: InferenceMode.PREFER_ON_DEVICE,
-    inCloudParams: { model: config.cloudModel },
+    onDeviceParams: {
+      createOptions: {
+        expectedInputs: [{ type: "text", languages: ["en"] }],
+        expectedOutputs: [{ type: "text", languages: ["en"] }],
+      },
+      promptOptions: {
+        responseConstraint: {
+          type: "object",
+          properties: {
+            findings: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  type: { type: "string" },
+                  text: { type: "string" },
+                },
+                required: ["type", "text"],
+              },
+            },
+          },
+          required: ["findings"],
+        },
+      },
+    },
+    inCloudParams: {
+      model: config.cloudModel,
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: findingSchema,
+      },
+    },
   });
 }
 
@@ -85,17 +142,13 @@ export async function isOnDeviceModelReady(): Promise<boolean> {
 export function createFirebaseModelRunner(): ModelRunner {
   return {
     isOnDeviceReady: isOnDeviceModelReady,
-    generate: async (request) => {
+    generate: async (request, hooks) => {
       const model = await getPlainSightModel();
       if (!model) throw new Error("Firebase is not configured");
       if (request.path === "on_device") {
-        await model.initializeDeviceModel(() => undefined);
-      } else {
-        try {
-          await model.initializeDeviceModel(() => undefined);
-        } catch {
-          // Nano can be missing. prefer_on_device then uses the cloud model.
-        }
+        await model.initializeDeviceModel((ratio) => {
+          hooks?.onDownloadProgress?.(ratio);
+        });
       }
       const result = await model.generateContent(request.prompt);
       const source = result.response.inferenceSource;
