@@ -191,3 +191,23 @@ Fixes: `restoreReply` walks findings in document order and swaps tokens one queu
 Re-score: **Tech 9.5 · Design 9.3 · Impact 9.2 · Idea 9.4**
 
 Gain: tech +0.1, design +0.2, impact +0.2, idea +1.0. Design and impact are still short of 9.5. The next round tries to break the detector, the cloud guard, and the restore.
+
+## Round 11 — Adversarial pass
+
+Opening scores: **Tech 9.5 · Design 9.3 · Impact 9.2 · Idea 9.4**
+
+Top 5 gaps, from attempts that failed closed:
+
+1. A cloud prompt could append the original after `----- END DOCUMENT -----`. The guard only read between the markers, so the assert passed.
+2. If the detector changed nothing, opting into the cloud sent the original and then offered that same text again.
+3. Overlapping spans dropped the later finding and left its tail in the outbox (`HELLO` plus `LO WORLD` leaked `WORLD`).
+4. Fullwidth digits, Arabic-Indic digits, and a Cyrillic `а` in `Mara` skipped the SSN and name patterns.
+5. A two-letter model needle such as `on` would have been painted onto every occurrence.
+
+What did not break: regex metacharacters in a rule stay literal, ledger JSON does not contain the sample SSN, a 20,000-word note finishes in under 1.5s, and markup in a destination is stored as text.
+
+Fixes: the cloud assert searches the whole prompt, refuses an unchanged document, and refuses a redacted payload that still matches a phone, email, or SSN. A refusal sends zero characters and does not re-offer the cloud. `redact` consumes the tail of an overlap. `normalizeForScan` folds NFKC, those digits, and a small lookalike alphabet before detection. Model findings shorter than four characters are ignored.
+
+Re-score: **Tech 9.6 · Design 9.4 · Impact 9.4 · Idea 9.4**
+
+Gain: tech +0.1, design +0.1, impact +0.2. Idea unchanged. Design, impact, and idea are still short of 9.5 because the reply-restore beat is easy to miss and the front-desk demo never lands on the measured 733-character set.

@@ -1,4 +1,5 @@
 import { detectHeuristic } from "./detect";
+import { normalizeForScan } from "./normalize";
 import { assertCloudPayloadIsRedacted, buildHybridPrompt } from "./hybrid";
 import type { ModelRunner } from "./model";
 import { resolveOverlaps } from "./overlap";
@@ -40,7 +41,10 @@ export async function runScan(
   if (input.length > MAX_DOCUMENT_CHARS) {
     throw new DocumentTooLargeError(input.length);
   }
-  const original = input.replace(/[\u200B-\u200D\uFEFF\u2060]/g, "");
+  const original = normalizeForScan(input);
+  if (original.length > MAX_DOCUMENT_CHARS) {
+    throw new DocumentTooLargeError(original.length);
+  }
   const heuristic = applyRules(detectHeuristic(original), original, rules);
   const redactedFirst = redact(original, heuristic);
   let findings = heuristic;
@@ -186,14 +190,21 @@ export async function runScan(
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : "unknown error";
+    const refused = message.startsWith("Refusing cloud request");
+    if (refused) {
+      sentTrace.payload = "none";
+      sentTrace.charactersSent = 0;
+    }
     return traced(
       {
         original,
         redacted: redactedFirst,
         findings,
         path: "heuristic_only",
-        detail: `The model call failed (${message}). Showing the on-device detector result.`,
-        cloudOffer: onDeviceReady ? null : redactedFirst,
+        detail: refused
+          ? message
+          : `The model call failed (${message}). Showing the on-device detector result.`,
+        cloudOffer: refused || onDeviceReady ? null : redactedFirst,
       },
       sentTrace,
     );

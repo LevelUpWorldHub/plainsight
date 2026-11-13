@@ -1,3 +1,4 @@
+import { detectHeuristic } from "./detect";
 import type { HybridPrompt } from "./types";
 
 const DOCUMENT_START = "----- DOCUMENT -----";
@@ -42,11 +43,7 @@ export function promptContainsRawDocument(
   redacted: string,
 ): boolean {
   if (!original || original === redacted) return false;
-  const marker = prompt.indexOf(DOCUMENT_START);
-  const end = prompt.indexOf(DOCUMENT_END);
-  if (marker < 0 || end < 0) return prompt.includes(original);
-  const document = prompt.slice(marker + DOCUMENT_START.length, end);
-  return document.includes(original);
+  return prompt.includes(original);
 }
 
 export function assertCloudPayloadIsRedacted(
@@ -55,11 +52,22 @@ export function assertCloudPayloadIsRedacted(
   redacted: string,
 ): void {
   if (request.path !== "cloud") return;
+  if (!redacted || redacted === original) {
+    throw new Error("Refusing cloud request: nothing was redacted, so the payload is the original.");
+  }
   if (request.documentText !== redacted) {
     throw new Error("Refusing cloud request: payload is not the redacted text.");
   }
   if (promptContainsRawDocument(request.prompt, original, redacted)) {
     throw new Error("Refusing cloud request: prompt still contains the raw document.");
+  }
+  const leftover = detectHeuristic(redacted).some((finding) =>
+    finding.type === "ssn" || finding.type === "email" || finding.type === "phone",
+  );
+  if (leftover) {
+    throw new Error(
+      "Refusing cloud request: the redacted text still contains a phone, email, or SSN.",
+    );
   }
   if (request.mode !== "prefer_on_device") {
     throw new Error("Refusing cloud request: inference mode is not prefer_on_device.");

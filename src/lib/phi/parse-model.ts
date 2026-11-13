@@ -34,7 +34,7 @@ export function parseModelFindings(raw: string, haystack: string): Finding[] {
     if (typeof type !== "string" || !isEntityType(type)) continue;
     if (typeof text !== "string") continue;
     const needle = text.trim();
-    if (needle.length < 2) continue;
+    if (needle.length < 4) continue;
     if (/^\[[A-Z][A-Z ]+\]$/.test(needle)) continue;
     if (!haystack.includes(needle)) continue;
     let from = 0;

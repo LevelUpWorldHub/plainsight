@@ -1,14 +1,16 @@
 import type { EntityType, Finding } from "./types";
 
 export function redact(text: string, findings: Finding[]): string {
-  const sorted = [...findings].sort((a, b) => a.start - b.start);
+  const sorted = [...findings].sort((a, b) => a.start - b.start || a.end - b.end);
   let output = "";
   let cursor = 0;
   for (const finding of sorted) {
-    if (finding.start < cursor) continue;
-    if (finding.start > text.length) break;
-    output += text.slice(cursor, finding.start);
-    output += finding.replacement;
+    if (finding.end <= cursor) continue;
+    const start = Math.max(finding.start, 0);
+    if (start >= text.length) break;
+    const emitFrom = Math.max(start, cursor);
+    output += text.slice(cursor, emitFrom);
+    if (start >= cursor) output += finding.replacement;
     cursor = Math.min(finding.end, text.length);
   }
   output += text.slice(cursor);
