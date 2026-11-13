@@ -38,7 +38,7 @@ export default function ImpactPage() {
       <section className="grid gap-3 sm:grid-cols-3">
         {[
           [total.redactions.toLocaleString(), "Identifiers marked"],
-          [`${percent}%`, "Of those documents held back"],
+          [`${percent}%`, "Share of characters that are identifiers"],
           [rows.length.toString(), "Fictional files measured"],
         ].map(([value, label]) => (
           <article key={label} className="paper-panel rounded-xl p-4">

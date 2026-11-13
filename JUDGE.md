@@ -173,3 +173,21 @@ Fixes: `/impact` runs `measureDocument` on the five fictional files at build tim
 Re-score: **Tech 9.4 · Design 9.1 · Impact 9.0 · Idea 8.4**
 
 Gain: design +0.1, impact +1.8, idea +0.2. Tech unchanged. The idea is still one step from a feature Rescriber cannot imitate in the same breath: putting the original back, locally, after the model replies.
+
+## Round 10 — Originality against the named rivals
+
+Opening scores: **Tech 9.4 · Design 9.1 · Impact 9.0 · Idea 8.4**
+
+Top 5 gaps:
+
+1. Nothing put the original back after the model replied, so the product stopped at the send.
+2. The rival contrast lived in the README, not on a page a judge opens.
+3. The impact card said “of those documents held back” next to a character percentage. That reading is false.
+4. A reply with two `[NAME]` tokens had no defined order.
+5. A token the scan never found could have been filled with a guess.
+
+Fixes: `restoreReply` walks findings in document order and swaps tokens one queue per label. A second `[SSN]` with only one SSN stays a token. The outbox has a restore box that does not copy and does not write the ledger. How it works now has a comparison table against Rescriber, Private Guard, and the sensitive-data-validator demo. The impact percentage is labeled as a share of characters.
+
+Re-score: **Tech 9.5 · Design 9.3 · Impact 9.2 · Idea 9.4**
+
+Gain: tech +0.1, design +0.2, impact +0.2, idea +1.0. Design and impact are still short of 9.5. The next round tries to break the detector, the cloud guard, and the restore.

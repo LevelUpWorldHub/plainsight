@@ -61,6 +61,42 @@ export default function HowPage() {
           </Link>
         </p>
       </section>
+      <section className="paper-panel rounded-xl p-4">
+        <h2 className="font-heading text-2xl">What the sender can see</h2>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          Rescriber redacts before an AI scribe. Private Guard warns or blocks a paste. Google’s sensitive-data-validator demo labels a string, and that string is what the model reads. None of those show the exact outbound text, wait for an approval, keep a device-local ledger, or put the original back after the reply.
+        </p>
+        <div className="mt-3 overflow-x-auto">
+          <table className="w-full min-w-[32rem] text-left text-sm">
+            <caption className="sr-only">
+              PlainSight compared with Rescriber, Private Guard, and the sensitive-data-validator demo
+            </caption>
+            <thead>
+              <tr className="border-b border-border text-muted-foreground">
+                <th scope="col" className="py-2 pr-3 font-medium">Sender can</th>
+                <th scope="col" className="py-2 pr-3 font-medium">Those tools</th>
+                <th scope="col" className="py-2 font-medium">PlainSight</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["Read the exact text that will leave", "Not shown", "Side-by-side outbox"],
+                ["Approve before anything is copied", "Not the product", "Required"],
+                ["Keep a local log of approvals", "Not on device", "IndexedDB, exportable"],
+                ["Write an exception in a sentence", "Not shown", "Plain-English rules"],
+                ["Black out a photo of the bill", "Not shown", "On-device OCR"],
+                ["Restore the reply without uploading it", "Not shown", "On this device only"],
+              ].map(([can, others, here]) => (
+                <tr key={can} className="border-b border-border">
+                  <th scope="row" className="py-2 pr-3 font-medium">{can}</th>
+                  <td className="py-2 pr-3">{others}</td>
+                  <td className="py-2">{here}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </div>
   );
 }

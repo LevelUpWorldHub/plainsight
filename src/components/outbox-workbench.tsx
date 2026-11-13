@@ -16,6 +16,7 @@ import {
   notifyLedgerChanged,
 } from "@/lib/phi/ledger";
 import { charactersHeld } from "@/lib/phi/redact";
+import { restoreReply } from "@/lib/phi/restore";
 import { runScan } from "@/lib/phi/run-scan";
 import { SAMPLE_DOCUMENTS, fetchSample } from "@/lib/phi/samples";
 import { DESTINATIONS, type PrivacyRule, type ScanResult } from "@/lib/phi/types";
@@ -30,6 +31,8 @@ export function OutboxWorkbench() {
   const [error, setError] = useState("");
   const [download, setDownload] = useState<number | null>(null);
   const [cue, setCue] = useState("");
+  const [reply, setReply] = useState("");
+  const [restored, setRestored] = useState("");
 
   useEffect(() => {
     const load = () => {
@@ -281,6 +284,38 @@ export function OutboxWorkbench() {
               {status === "saving" ? "Saving the outbox…" : `Approve and copy for ${destination}`}
             </Button>
           </div>
+          <section className="paper-panel rounded-xl p-4">
+            <h2 className="font-heading text-xl">Bring the reply back, here</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Paste the chatbot’s answer. PlainSight swaps tokens for the originals in the order they appeared. The restored text stays on this device. It is not copied and not written to the ledger.
+            </p>
+            <Textarea
+              value={reply}
+              onChange={(event) => setReply(event.target.value)}
+              placeholder="Paste the reply that still contains [NAME] or [SSN]."
+              className="mt-3 min-h-28 font-mono text-sm"
+              aria-label="Chat reply to restore"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-3"
+              onClick={() => {
+                const next = restoreReply(reply, result.findings);
+                setRestored(next.text);
+                setNotice(
+                  `Restored ${next.restored} token${next.restored === 1 ? "" : "s"} on this device${next.unmatched ? `, ${next.unmatched} left unmatched` : ""}. Nothing was copied.`,
+                );
+              }}
+            >
+              Restore on this device
+            </Button>
+            {restored ? (
+              <p className="mt-3 font-mono text-sm whitespace-pre-wrap" aria-live="polite">
+                {restored}
+              </p>
+            ) : null}
+          </section>
           {result.cloudOffer ? (
             <div className="paper-panel rounded-xl p-4">
               <h2 className="font-heading text-xl">Optional cloud check</h2>
