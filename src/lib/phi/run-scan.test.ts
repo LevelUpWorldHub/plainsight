@@ -86,6 +86,22 @@ describe("runScan", () => {
     expect(result.redacted).not.toContain("Maya Chen");
   });
 
+  it("discards model suggestions when the inference source is missing", async () => {
+    const model = runner(
+      true,
+      JSON.stringify({ findings: [{ type: "name", text: "Maya Chen" }] }),
+      "unknown",
+    );
+    const result = await runScan(original, [], {
+      firebaseConfigured: true,
+      allowCloud: false,
+      model,
+    });
+    expect(result.path).toBe("heuristic_only");
+    expect(result.redacted).toContain("Maya Chen");
+    expect(result.detail).toMatch(/on-device inference source/i);
+  });
+
   it("discards model suggestions if a Nano call falls through to the cloud", async () => {
     const model = runner(
       true,

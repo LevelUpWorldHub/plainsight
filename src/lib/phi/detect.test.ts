@@ -85,6 +85,38 @@ describe("heuristic detector", () => {
     expect(redacted).toContain("11/18/2026");
   });
 
+  it("keeps a middle initial and a third given name without swallowing the next label", () => {
+    const text = "Patient: Mara J. Ellison\nDOB: 03/14/1986\nPatient: Mary Anne Smith";
+    const redacted = redact(text, detectHeuristic(text));
+    expect(redacted).not.toContain("Mara J. Ellison");
+    expect(redacted).not.toContain("Mary Anne Smith");
+    expect(redacted).toContain("DOB:");
+    expect(redacted).not.toContain("03/14/1986");
+  });
+
+  it("reads an SSN written with spaces", () => {
+    const redacted = redact("SSN: 453 22 1890", detectHeuristic("SSN: 453 22 1890"));
+    expect(redacted).toBe("SSN: [SSN]");
+  });
+
+  it("leaves a clinic street address that is not the patient's", () => {
+    const text = [
+      "VALLEY PAPER CLINIC",
+      "100 Market Street, San Francisco, CA 94105",
+      "Patient: Mara Ellison",
+      "Home Address: 14 Cedar Court, Seattle, WA 98101",
+    ].join("\n");
+    const redacted = redact(text, detectHeuristic(text));
+    expect(redacted).toContain("100 Market Street");
+    expect(redacted).not.toContain("14 Cedar Court");
+    expect(redacted).not.toContain("Mara Ellison");
+  });
+
+  it("still redacts a letterhead address that is also the patient's home", () => {
+    const redacted = redact(sample("medical-bill.txt"), detectHeuristic(sample("medical-bill.txt")));
+    expect(redacted).not.toContain("1842 Valencia Street");
+  });
+
   it("flags each requested identifier class", () => {
     const text = [
       "Patient: Ada Lovelace",

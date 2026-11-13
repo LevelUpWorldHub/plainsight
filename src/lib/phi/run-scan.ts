@@ -81,18 +81,17 @@ export async function runScan(
     assertCloudPayloadIsRedacted(request, original, redactedFirst);
     const response = await options.model!.generate(request);
     const wentToCloud = response.inferenceSource === "in_cloud";
-    const stayedOnDevice =
-      response.inferenceSource === "on_device" ||
-      (request.path === "on_device" && response.inferenceSource === "unknown");
+    const stayedOnDevice = response.inferenceSource === "on_device";
 
-    if (request.path === "on_device" && wentToCloud) {
+    if (request.path === "on_device" && !stayedOnDevice) {
       return {
         original,
         redacted: redactedFirst,
         findings,
-        path: "cloud",
-        detail:
-          "Cloud Gemini ran even though PlainSight expected Gemini Nano. Model suggestions were discarded. Review the outbox before approving.",
+        path: wentToCloud ? "cloud" : "heuristic_only",
+        detail: wentToCloud
+          ? "Cloud Gemini ran even though PlainSight expected Gemini Nano. Model suggestions were discarded. Review the outbox before approving."
+          : "The model did not report an on-device inference source. Model suggestions were discarded.",
         cloudOffer: null,
       };
     }

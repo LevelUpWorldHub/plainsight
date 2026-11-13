@@ -30,7 +30,7 @@ const PHRASES: { type: EntityType; pattern: RegExp }[] = [
   { type: "mrn", pattern: /^(?:mrns?|medical\s+record\s+numbers?)$/i },
   {
     type: "address",
-    pattern: /^(?:addresses?|home\s+addresses?|street\s+addresses?)$/i,
+    pattern: /^(?:address(?:es)?|home\s+address(?:es)?|street\s+address(?:es)?)$/i,
   },
   { type: "diagnosis", pattern: /^(?:diagnoses|diagnosis|conditions?)$/i },
   {
@@ -74,6 +74,20 @@ function directivesForTarget(
         ? { kind: "keep_type", entityType: "name" }
         : { kind: "redact_type", entityType: "name" },
     ];
+  }
+
+  const possessive = body.match(
+    /^(?:her|his|their|my|the)\s+(.+)$/i,
+  );
+  if (possessive?.[1]) {
+    const owned = matchEntityPhrase(possessive[1]);
+    if (owned) {
+      return [
+        mode === "keep"
+          ? { kind: "keep_type", entityType: owned }
+          : { kind: "redact_type", entityType: owned },
+      ];
+    }
   }
 
   const entityType = matchEntityPhrase(body);

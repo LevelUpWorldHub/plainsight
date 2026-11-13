@@ -60,6 +60,14 @@ describe("plain-English rules", () => {
     expect(redacted).not.toContain("453-22-1890");
   });
 
+  it("maps a possessive address clause to the address type", () => {
+    const rule = parseRule("never send my kid's name Maya Chen and her address");
+    expect(rule.directives).toEqual([
+      { kind: "redact_literal", literal: "Maya Chen", entityType: "name" },
+      { kind: "redact_type", entityType: "address" },
+    ]);
+  });
+
   it("keeps every type joined with and", () => {
     const rule = parseRule("keep phone numbers and email addresses");
     expect(rule.directives).toEqual([

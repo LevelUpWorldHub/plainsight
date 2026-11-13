@@ -122,14 +122,73 @@ function takePattern(rest: string, pattern: RegExp): string | null {
   return match?.[1] ?? null;
 }
 
+const NAME_STOP = new Set([
+  "dob",
+  "mrn",
+  "ssn",
+  "phone",
+  "email",
+  "member",
+  "group",
+  "home",
+  "date",
+  "diagnosis",
+  "medications",
+  "medication",
+  "address",
+  "physician",
+  "patient",
+  "amount",
+  "secondary",
+  "balance",
+  "due",
+  "total",
+  "statement",
+  "paid",
+  "account",
+]);
+
+function isNameStop(part: string): boolean {
+  return NAME_STOP.has(part.replace(/[.]/g, "").toLowerCase());
+}
+
+function isInitial(part: string): boolean {
+  return /^[A-Z]\.?$/.test(part);
+}
+
 function takePersonName(rest: string): string | null {
-  const match = rest.match(/^([A-Z][A-Za-z.'-]+(?:[ \t]+[A-Z][A-Za-z.'-]+){1,3})/);
+  const match = rest.match(/^([A-Z][A-Za-z.'’-]+(?:[ \t]+[A-Z][A-Za-z.'’-]+){1,3})/);
   if (!match?.[1]) return null;
-  const parts = match[1].split(/[ \t]+/);
+  const parts: string[] = [];
+  for (const part of match[1].split(/[ \t]+/)) {
+    if (isNameStop(part)) break;
+    parts.push(part);
+  }
   const honorific = /^(?:Dr|Mr|Mrs|Ms)\.?$/.test(parts[0] ?? "");
-  const kept = honorific ? parts.slice(0, 4) : parts.slice(0, 2);
+  let limit = honorific ? 4 : 2;
+  if (!honorific && parts[1] && isInitial(parts[1]) && parts[2]) limit = 3;
+  else if (!honorific && parts[2] && /^[A-Z][a-z.'’-]+$/.test(parts[2])) limit = 3;
+  const kept = parts.slice(0, limit);
   if (kept.length < 2) return null;
   return kept.join(" ");
+}
+
+function normalizeAddress(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function dropPublicLetterhead(text: string, findings: Finding[]): Finding[] {
+  const patientAt = text.search(/\b(?:PATIENT\b|Patient\b|Member\b|Subscriber\b)/);
+  if (patientAt < 0) return findings;
+  const patientAddresses = new Set(
+    findings
+      .filter((finding) => finding.type === "address" && finding.start >= patientAt)
+      .map((finding) => normalizeAddress(finding.text)),
+  );
+  return findings.filter((finding) => {
+    if (finding.type !== "address" || finding.start >= patientAt) return true;
+    return patientAddresses.has(normalizeAddress(finding.text));
+  });
 }
 
 function takeLine(rest: string, accept: (line: string) => boolean): string | null {
@@ -303,5 +362,5 @@ export function detectHeuristic(text: string): Finding[] {
     findings,
   );
 
-  return resolveOverlaps(findings);
+  return resolveOverlaps(dropPublicLetterhead(text, findings));
 }
