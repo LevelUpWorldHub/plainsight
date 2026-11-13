@@ -1,0 +1,24 @@
+FICTIONAL SAMPLE — not a real patient. Invented for the PlainSight demo.
+
+VALLEY PAPER CLINIC
+1842 Valencia Street, San Francisco, CA 94110
+Phone: (415) 555-0148
+
+PATIENT STATEMENT
+Patient: Mara Ellison
+DOB: 03/14/1986
+MRN: 00482193
+Member ID: XTR-4491208
+Group Number: 88G-2291
+SSN: 453-22-1890
+Home Address: 1842 Valencia Street, San Francisco, CA 94110
+Email: mara.ellison@example.com
+Physician: Dr. Helen Cho
+
+Date of service: 11/02/2026
+Diagnosis: Type 2 diabetes mellitus (E11.9)
+Secondary diagnosis: Essential hypertension (I10.0)
+Medications: Metformin 500 mg, Lisinopril 10 mg
+
+Amount due: $186.40
+Pay at the front desk. Do not paste this statement into a chatbot.

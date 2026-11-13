@@ -1,0 +1,17 @@
+FICTIONAL SAMPLE — not a real patient. Invented for the PlainSight demo.
+
+INTAKE FORM
+Patient Name: Elena Vasquez
+DOB: 04/02/1988
+SSN: 521-44-9088
+Phone: (206) 555-0133
+Email: elena.vasquez@example.com
+Home Address: 14 Cedar Court, Seattle, WA 98101
+Insurance ID: BLU-8832104
+Emergency Contact: Luis Vasquez
+Reason for visit: follow-up
+
+Guarantor: Elena Vasquez
+Preferred pharmacy phone: (206) 555-0160
+
+Front desk: confirm the redacted copy before any AI scribe.

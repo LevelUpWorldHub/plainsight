@@ -1,0 +1,18 @@
+.plainsight-check {
+  position: fixed;
+  z-index: 2147483646;
+  border: 1.5px solid #1d4f4a;
+  background: #f7f3ea;
+  color: #1c1915;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font: 600 12px/1.2 "Segoe UI", sans-serif;
+  letter-spacing: 0.01em;
+  box-shadow: 0 6px 18px rgb(28 25 21 / 16%);
+  cursor: pointer;
+}
+
+.plainsight-check:hover {
+  background: #1d4f4a;
+  color: #f7f3ea;
+}

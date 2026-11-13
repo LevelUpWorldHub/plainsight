@@ -1,0 +1,13 @@
+FICTIONAL SAMPLE — not a real patient. Invented for the PlainSight demo.
+
+NOTE FROM A CAREGIVER
+Patient: Elena Vasquez
+DOB: 04/02/1988
+Phone: (206) 555-0133
+
+The school asked me to summarize the week. Maya Chen has been tired in the afternoons since starting Sertraline 50 mg. I do not want her name in any chatbot. Her emergency form lists a different contact than the one below.
+
+Emergency Contact: Luis Vasquez
+
+Date of the school meeting: 11/18/2026
+Please help me phrase questions for the pediatric visit. Keep the advice general.

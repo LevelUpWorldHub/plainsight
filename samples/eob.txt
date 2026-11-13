@@ -1,0 +1,18 @@
+FICTIONAL SAMPLE — not a real patient. Invented for the PlainSight demo.
+
+EXPLANATION OF BENEFITS
+Payer: Northwind Mutual (fictional)
+Subscriber: Jonah Hale
+Subscriber ID: NM-2201846
+Patient: Jonah Hale
+DOB: 07/22/1979
+Group Number: 44190
+Claim number: CLM-100293
+
+Service date: 09/15/2026
+Diagnosis: Asthma (J45.909)
+Provider phone: (628) 555-0172
+Mailing Address: 90 Birch Lane, Oakland, CA 94607
+
+Patient responsibility: $40.00
+This EOB is fiction. It is not a bill from a real insurer.

@@ -1,0 +1,16 @@
+FICTIONAL SAMPLE — not a real patient. Invented for the PlainSight demo.
+
+PAPER LABORATORY
+Patient: Priya Raman
+DOB: 12/05/1991
+MRN: A449218
+Phone: 503-555-0199
+Email: priya.raman@example.com
+
+Collected: 10/30/2026
+Panel: Comprehensive metabolic
+Result: Glucose 142 mg/dL (high)
+Diagnosis: Type 2 diabetes mellitus (E11.9)
+Ordering physician: Dr. Helen Cho
+
+Reference ranges are fictional. Do not use them for care.
