@@ -38,6 +38,9 @@ export function DiffView({
           <h2 className="font-heading text-lg">Held on this device</h2>
           <span className="stamp text-muted-foreground">Original</span>
         </header>
+        <p className="mb-2 text-xs text-muted-foreground">
+          <mark className="phi-mark">Marked</mark> text stays on this device.
+        </p>
         <p className="font-mono text-sm leading-6 whitespace-pre-wrap break-words">
           {segments.map((segment, index) =>
             segment.finding ? (
@@ -59,6 +62,9 @@ export function DiffView({
           <h2 className="font-heading text-lg">Will leave the device</h2>
           <span className="stamp text-primary">Outbox</span>
         </header>
+        <p className="mb-2 text-xs text-muted-foreground">
+          <mark className="token-mark">[TOKEN]</mark> is what a chatbot would see.
+        </p>
         <p className="font-mono text-sm leading-6 whitespace-pre-wrap break-words">
           {redactedParts.map((part, index) => (
             <span key={`redacted-${index}`}>

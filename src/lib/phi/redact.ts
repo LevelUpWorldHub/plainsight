@@ -15,6 +15,10 @@ export function redact(text: string, findings: Finding[]): string {
   return output;
 }
 
+export function charactersHeld(findings: Finding[]): number {
+  return findings.reduce((sum, finding) => sum + Math.max(0, finding.end - finding.start), 0);
+}
+
 export function countByType(
   findings: Finding[],
 ): Partial<Record<EntityType, number>> {

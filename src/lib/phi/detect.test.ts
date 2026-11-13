@@ -31,8 +31,9 @@ describe("heuristic detector", () => {
     expect(redacted).not.toContain("Lisinopril");
     expect(redacted).not.toContain("E11.9");
     expect(redacted).not.toContain("I10.0");
-    expect(redacted).toContain("11/02/2026");
+    expect(redacted).toContain("Date of service: 11/02/2026");
     expect(redacted).toContain("$186.40");
+    expect(redacted).not.toMatch(/\[NAME\] of service/);
     expect(redacted).toContain("VALLEY PAPER CLINIC");
     expect(redacted).toContain("[SSN]");
     expect(redacted).toContain("[INSURANCE ID]");

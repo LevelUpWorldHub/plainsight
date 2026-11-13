@@ -31,8 +31,13 @@ function badgeLabel(path: ScanResult["path"]): string {
   return "On-device heuristic";
 }
 
+function shotSample(): string {
+  if (new URLSearchParams(location.search).get("shot") !== "1") return "";
+  return EXTENSION_SAMPLES[0]?.text ?? "";
+}
+
 function SidePanel() {
-  const [text, setText] = useState("");
+  const [text, setText] = useState(shotSample);
   const [destination, setDestination] = useState("ChatGPT");
   const [tabId, setTabId] = useState<number | null>(null);
   const [rules, setRules] = useState<PrivacyRule[]>([]);
@@ -42,7 +47,13 @@ function SidePanel() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (new URLSearchParams(location.search).get("shot") === "1") {
+      const sample = EXTENSION_SAMPLES[0]?.text ?? "";
+      void runScan(sample, [], { firebaseConfigured: false, allowCloud: false }).then(setResult);
+    }
     listStoredRules<PrivacyRule>().then(setRules).catch(() => setRules([]));
+    const chromeApi = globalThis.chrome;
+    if (!chromeApi?.storage?.session || !chromeApi.storage.onChanged) return;
     const apply = (pending?: PendingPayload) => {
       if (!pending) return;
       setText(pending.text ?? "");
@@ -50,7 +61,7 @@ function SidePanel() {
       setTabId(pending.tabId ?? null);
       setResult(null);
     };
-    chrome.storage.session.get("pending").then((stored) => {
+    chromeApi.storage.session.get("pending").then((stored) => {
       apply(stored.pending as PendingPayload | undefined);
     });
     const listener = (
@@ -61,8 +72,8 @@ function SidePanel() {
         apply(changes.pending.newValue as PendingPayload);
       }
     };
-    chrome.storage.onChanged.addListener(listener);
-    return () => chrome.storage.onChanged.removeListener(listener);
+    chromeApi.storage.onChanged.addListener(listener);
+    return () => chromeApi.storage.onChanged.removeListener(listener);
   }, []);
 
   async function scan(allowCloud: boolean) {

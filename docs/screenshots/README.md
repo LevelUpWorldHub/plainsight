@@ -7,4 +7,4 @@ Stills from the local PlainSight app. Every document in them is fictional (`samp
 - `ledger.png` — an expanded ledger row
 - `screenshot.png` — sample bill image beside the redacted image
 
-`extension.png` is not here yet. Capture the Chrome side panel after loading `extension/dist` and drop it in this folder before the Devpost gallery.
+- `extension.png` — the side panel (`extension/dist/sidepanel.html?shot=1`) after a local scan of the fictional clinic bill. Load the unpacked extension from `extension/dist` for the live panel.

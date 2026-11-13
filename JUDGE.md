@@ -47,3 +47,21 @@ Fixes: every scan now carries a `trace` (`prefer_on_device`, payload kind, chara
 Re-score: **Tech 8.0 · Design 7.3 · Impact 6.2 · Idea 7.7**
 
 Gain: tech +0.8, design +0.2, idea +0.2. Impact unchanged. The trace is visible, but the outbox still does not lead with how much was held back, and `docs/screenshots/extension.png` is still missing. Live Nano and App Check still need Mark’s Firebase project.
+
+## Round 3 — Design and UX
+
+Opening scores: **Tech 8.0 · Design 7.3 · Impact 6.2 · Idea 7.7**
+
+Top 5 gaps:
+
+1. `docs/screenshots/extension.png` was missing, so the extension claim had no picture.
+2. The outbox did not say how many characters were held back.
+3. The two columns had no legend, so a first-time judge had to infer yellow marks versus black tokens.
+4. Nano download progress was rendered only after the scan finished, which is when it no longer matters.
+5. Shooting the side panel exposed a detector bug: `Dr. Helen Cho` crossed a newline and ate the word “Date” from “Date of service.”
+
+Fixes: character-held badge with a percent of the document, column legends, progress copy while the scan is running, side-panel focus rings, and `extension.png` from the built panel. Honorific names no longer cross lines. The service date line stays intact.
+
+Re-score: **Tech 8.3 · Design 8.1 · Impact 6.6 · Idea 7.7**
+
+Gain: tech +0.3, design +0.8, impact +0.4. The percent is the first number a judge sees that comes from the document in front of them. The panel is still visually quieter than the web app, and there is no guided path through the demo.

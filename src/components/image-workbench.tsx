@@ -166,7 +166,7 @@ export function ImageWorkbench() {
               OCR ran in this browser. {result.detail}
             </p>
           </div>
-          <FindingSummary findings={result.findings as Finding[]} />
+          <FindingSummary findings={result.findings as Finding[]} originalLength={result.original.length} />
           <div className="grid gap-3 lg:grid-cols-2">
             <figure className="paper-panel rounded-xl p-3">
               <figcaption className="mb-2 text-sm font-medium">Original image, held here</figcaption>

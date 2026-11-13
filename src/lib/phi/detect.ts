@@ -317,7 +317,7 @@ export function detectHeuristic(text: string): Finding[] {
 
   scanGlobal(
     text,
-    /\b(?:Mr|Mrs|Ms|Dr)\.?\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2}\b/g,
+    /\b(?:Mr|Mrs|Ms|Dr)\.?(?:[ \t]+[A-Z][A-Za-z.'’-]+){1,3}\b/g,
     "name",
     0.8,
     findings,

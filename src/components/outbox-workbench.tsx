@@ -169,6 +169,13 @@ export function OutboxWorkbench() {
           >
             {status === "scanning" ? "Reading on this device…" : "Scan on this device"}
           </Button>
+          {status === "scanning" ? (
+            <p role="status" className="text-sm text-muted-foreground">
+              {download !== null
+                ? `Gemini Nano download ${Math.round(download * 100)}%. The document stays here while it finishes.`
+                : "Reading on this device. Nothing has been sent."}
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -204,11 +211,6 @@ export function OutboxWorkbench() {
               <PathBadge path={result.path} />
               <p className="max-w-2xl text-sm text-muted-foreground">{result.detail}</p>
               <ScanTraceNote trace={result.trace} />
-              {download !== null ? (
-                <p className="text-sm text-muted-foreground">
-                  Gemini Nano download {Math.round(download * 100)}%.
-                </p>
-              ) : null}
             </div>
             <p className="text-sm text-muted-foreground">
               {rules.length === 0
@@ -221,7 +223,7 @@ export function OutboxWorkbench() {
               The document changed after this scan. Scan again before approving.
             </p>
           ) : null}
-          <FindingSummary findings={result.findings} />
+          <FindingSummary findings={result.findings} originalLength={result.original.length} />
           <DiffView original={result.original} redacted={result.redacted} findings={result.findings} />
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button

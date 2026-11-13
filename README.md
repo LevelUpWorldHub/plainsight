@@ -61,7 +61,7 @@ Firebase App Check is initialized before AI Logic, with reCAPTCHA Enterprise on 
 
 ## Screenshots
 
-These stills are from the local app, using only the fictional samples. They are not real patients. The browser frame is included. Add `docs/screenshots/extension.png` after you load the unpacked extension on a chat site.
+These stills are from the local app and the extension side panel, using only the fictional samples. They are not real patients. The browser frame is included on the web shots.
 
 ![Outbox for the fictional clinic bill](docs/screenshots/outbox.png)
 
@@ -70,6 +70,8 @@ These stills are from the local app, using only the fictional samples. They are 
 ![Ledger row with a redacted preview](docs/screenshots/ledger.png)
 
 ![Sample bill beside the redacted image](docs/screenshots/screenshot.png)
+
+![Extension side panel after a local scan](docs/screenshots/extension.png)
 
 ## Run the web app
 

@@ -85,6 +85,11 @@ button.secondary {
 
 button:disabled { opacity: 0.55; cursor: default; }
 
+button:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid #1d4f4a;
+  outline-offset: 2px;
+}
+
 .badge {
   display: inline-block;
   border-radius: 999px;
