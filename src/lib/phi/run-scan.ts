@@ -33,13 +33,14 @@ function traced(
 }
 
 export async function runScan(
-  original: string,
+  input: string,
   rules: PrivacyRule[],
   options: ScanOptions,
 ): Promise<ScanResult> {
-  if (original.length > MAX_DOCUMENT_CHARS) {
-    throw new DocumentTooLargeError(original.length);
+  if (input.length > MAX_DOCUMENT_CHARS) {
+    throw new DocumentTooLargeError(input.length);
   }
+  const original = input.replace(/[\u200B-\u200D\uFEFF\u2060]/g, "");
   const heuristic = applyRules(detectHeuristic(original), original, rules);
   const redactedFirst = redact(original, heuristic);
   let findings = heuristic;

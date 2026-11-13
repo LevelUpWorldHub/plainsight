@@ -135,6 +135,14 @@ describe("runScan", () => {
 });
 
 describe("runScan edges", () => {
+  it("strips invisible characters so a split SSN cannot sneak through", async () => {
+    const hidden = "SSN: 453-\u200B22-\u200B1890";
+    const result = await runScan(hidden, [], { firebaseConfigured: false, allowCloud: false });
+    expect(result.original).not.toContain("\u200B");
+    expect(result.redacted).not.toContain("1890");
+    expect(result.redacted).toContain("[SSN]");
+  });
+
   it("returns an empty outbox for an empty document", async () => {
     const result = await runScan("", [], { firebaseConfigured: false, allowCloud: false });
     expect(result.redacted).toBe("");

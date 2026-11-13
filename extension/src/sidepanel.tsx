@@ -63,6 +63,7 @@ function SidePanel() {
     };
     chromeApi.storage.session.get("pending").then((stored) => {
       apply(stored.pending as PendingPayload | undefined);
+      if (stored.pending) void chromeApi.storage.session.remove("pending");
     });
     const listener = (
       changes: { [key: string]: chrome.storage.StorageChange },
