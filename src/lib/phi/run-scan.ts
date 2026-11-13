@@ -14,6 +14,17 @@ export interface ScanOptions {
   onDownloadProgress?: (ratio: number) => void;
 }
 
+export const MAX_DOCUMENT_CHARS = 200_000;
+
+export class DocumentTooLargeError extends Error {
+  constructor(length: number) {
+    super(
+      `This document is ${length.toLocaleString()} characters. PlainSight scans up to ${MAX_DOCUMENT_CHARS.toLocaleString()} characters on this device.`,
+    );
+    this.name = "DocumentTooLargeError";
+  }
+}
+
 function traced(
   result: Omit<ScanResult, "trace">,
   trace: ScanTrace,
@@ -26,6 +37,9 @@ export async function runScan(
   rules: PrivacyRule[],
   options: ScanOptions,
 ): Promise<ScanResult> {
+  if (original.length > MAX_DOCUMENT_CHARS) {
+    throw new DocumentTooLargeError(original.length);
+  }
   const heuristic = applyRules(detectHeuristic(original), original, rules);
   const redactedFirst = redact(original, heuristic);
   let findings = heuristic;

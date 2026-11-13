@@ -65,3 +65,21 @@ Fixes: character-held badge with a percent of the document, column legends, prog
 Re-score: **Tech 8.3 · Design 8.1 · Impact 6.6 · Idea 7.7**
 
 Gain: tech +0.3, design +0.8, impact +0.4. The percent is the first number a judge sees that comes from the document in front of them. The panel is still visually quieter than the web app, and there is no guided path through the demo.
+
+## Round 4 — Robustness
+
+Opening scores: **Tech 8.3 · Design 8.1 · Impact 6.6 · Idea 7.7**
+
+Top 5 gaps:
+
+1. A multi-megabyte paste could hang the regex detector on the main thread with no limit.
+2. Offline was indistinguishable from “Firebase is missing,” so a judge on a plane would think the product was broken.
+3. Empty input was only guarded in the button, not in `runScan`.
+4. A model that replied in prose, including a repeated SSN, had no regression test. The parser might have been trusted too quickly.
+5. Download and ledger failures were messaged, but the size limit and the prose-model case were not locked in CI.
+
+Fixes: scans over 200,000 characters throw `DocumentTooLargeError` before detection. An offline banner states that the detector, rules, and ledger still run. Tests cover an empty document, the size cap, and a prose model reply that tries to repeat an SSN. That reply does not reintroduce the number.
+
+Re-score: **Tech 8.6 · Design 8.2 · Impact 6.6 · Idea 7.7**
+
+Gain: tech +0.3, design +0.1. Impact and idea unchanged. The product still waits for the user to know the demo order.

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { ModelRunner } from "./model";
 import { parseModelFindings } from "./parse-model";
-import { runScan } from "./run-scan";
+import { DocumentTooLargeError, MAX_DOCUMENT_CHARS, runScan } from "./run-scan";
 import { parseRule } from "./rules";
 
 const original = "SSN: 453-22-1890\nSchool note about Maya Chen.";
@@ -131,6 +131,34 @@ describe("runScan", () => {
     expect(result.path).toBe("cloud");
     expect(result.redacted).toContain("Maya Chen");
     expect(result.detail).toMatch(/discarded/i);
+  });
+});
+
+describe("runScan edges", () => {
+  it("returns an empty outbox for an empty document", async () => {
+    const result = await runScan("", [], { firebaseConfigured: false, allowCloud: false });
+    expect(result.redacted).toBe("");
+    expect(result.findings).toEqual([]);
+    expect(result.trace.charactersSent).toBe(0);
+  });
+
+  it("refuses a document that is too large to scan on device", async () => {
+    const huge = "a".repeat(MAX_DOCUMENT_CHARS + 1);
+    await expect(runScan(huge, [], { firebaseConfigured: false, allowCloud: true })).rejects.toBeInstanceOf(
+      DocumentTooLargeError,
+    );
+  });
+
+  it("keeps the heuristic result when the model returns prose instead of JSON", async () => {
+    const model = runner(true, "Sure, here is the patient's SSN: 453-22-1890");
+    const result = await runScan(original, [], {
+      firebaseConfigured: true,
+      allowCloud: false,
+      model,
+    });
+    expect(result.path).toBe("on_device");
+    expect(result.redacted).not.toContain("453-22-1890");
+    expect(result.redacted).toContain("Maya Chen");
   });
 });
 

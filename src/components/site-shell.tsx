@@ -1,9 +1,31 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "cn";
+
+function OfflineNote() {
+  const [offline, setOffline] = useState(
+    () => typeof navigator !== "undefined" && navigator.onLine === false,
+  );
+  useEffect(() => {
+    const sync = () => setOffline(navigator.onLine === false);
+    window.addEventListener("offline", sync);
+    window.addEventListener("online", sync);
+    return () => {
+      window.removeEventListener("offline", sync);
+      window.removeEventListener("online", sync);
+    };
+  }, []);
+  if (!offline) return null;
+  return (
+    <p role="status" className="bg-accent px-4 py-2 text-center text-sm text-accent-foreground">
+      This browser is offline. The detector, rules, and ledger still run here. Cloud Gemini does not.
+    </p>
+  );
+}
 
 const NAV = [
   { href: "/", label: "Outbox" },
@@ -18,6 +40,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-full flex-col">
       <div className="h-1 bg-primary" />
+      <OfflineNote />
       <header className="border-b border-border bg-card/80">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-4 sm:px-6">
           <div className="flex items-start justify-between gap-4">
