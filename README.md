@@ -1,5 +1,7 @@
 # PlainSight
 
+**Live demo:** [https://plainsight-hybridai.vercel.app](https://plainsight-hybridai.vercel.app)
+
 PlainSight is a privacy layer that runs before medical paperwork leaves a device. Patients, caregivers, and front-desk staff paste bills, explanations of benefits, lab results, and intake forms into AI chatbots. PlainSight marks the personal and medical details first, shows the exact text that would be sent, and waits for an approval.
 
 The original stays on the device until that approval. The local ledger records the redacted payload, not the source document.
