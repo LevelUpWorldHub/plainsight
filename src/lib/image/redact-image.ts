@@ -26,8 +26,14 @@ type CreateWorker = (
   oem?: number,
   options?: {
     logger?: (message: { status: string; progress: number }) => void;
+    workerPath?: string;
+    corePath?: string;
+    langPath?: string;
   },
 ) => Promise<OcrWorker>;
+
+/** Same-origin worker, wasm, and English model under public/tesseract (see scripts/vendor-tesseract.mjs). */
+const TESSERACT_ASSET_PATH = "/tesseract";
 
 async function loadTesseract(onProgress?: (message: string) => void): Promise<CreateWorker> {
   const imported = (await import("tesseract.js")) as unknown as {
@@ -48,6 +54,9 @@ export async function recognizeLines(
 ): Promise<OcrWord[][]> {
   const createWorker = await loadTesseract(onProgress);
   const worker = await createWorker("eng", 1, {
+    workerPath: `${TESSERACT_ASSET_PATH}/worker.min.js`,
+    corePath: TESSERACT_ASSET_PATH,
+    langPath: TESSERACT_ASSET_PATH,
     logger: (message) => {
       const percent = Math.round((message.progress ?? 0) * 100);
       onProgress?.(`${message.status} ${percent}%`);

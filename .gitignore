@@ -46,3 +46,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# vendored tesseract.js worker, wasm cores, and language data
+/public/tesseract/
